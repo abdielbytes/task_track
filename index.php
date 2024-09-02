@@ -1,8 +1,10 @@
 <?php
 require 'db.php';
 
-$stmt = $pdo->query('SELECT * FROM tasks ORDER BY created_at DESC');
-$tasks = $stmt->fetchAll();
+// Fetch tasks from the database
+$stmt = $pdo->prepare("SELECT * FROM tasks ORDER BY created_at DESC");
+$stmt->execute();
+$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -13,25 +15,26 @@ $tasks = $stmt->fetchAll();
 </head>
 <body>
     <h1>Task Tracker</h1>
-    <a href="create.php">Add New Task</a>
-    <table border="1">
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
+
+    <form action="create_task.php" method="POST">
+        <input type="text" name="title" placeholder="Task Title" required>
+        <textarea name="description" placeholder="Task Description"></textarea>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <h2>Tasks</h2>
+    <ul>
         <?php foreach ($tasks as $task): ?>
-            <tr>
-                <td><?= htmlspecialchars($task['title']); ?></td>
-                <td><?= htmlspecialchars($task['description']); ?></td>
-                <td><?= htmlspecialchars($task['status']); ?></td>
-                <td>
-                    <a href="edit.php?id=<?= $task['id']; ?>">Edit</a>
-                    <a href="delete.php?id=<?= $task['id']; ?>" onclick="return confirm('Are you sure?');">Delete</a>
-                </td>
-            </tr>
+            <li>
+                <strong><?php echo htmlspecialchars($task['title']); ?></strong>
+                <p><?php echo htmlspecialchars($task['description']); ?></p>
+                <p>Status: <?php echo htmlspecialchars($task['status']); ?></p>
+                <?php if ($task['status'] === 'pending'): ?>
+                    <a href="complete_task.php?id=<?php echo $task['id']; ?>">Complete</a>
+                <?php endif; ?>
+                <a href="delete_task.php?id=<?php echo $task['id']; ?>">Delete</a>
+            </li>
         <?php endforeach; ?>
-    </table>
+    </ul>
 </body>
 </html>
