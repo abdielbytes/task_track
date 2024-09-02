@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = 'task_tracker';
+$db   = 'task_track';
 $user = 'root';
 $pass = ''; 
 $charset = 'utf8mb4';
